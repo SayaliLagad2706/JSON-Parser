@@ -1,0 +1,116 @@
+<!Doctype>
+<html>
+    <head>
+        <style>
+            .container {
+                padding-top: 10%;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <p>
+                <b>Enter URL for largest manufacturers by production (2017) List JSON File</b>
+            </p>
+            <input type="input" name="jsonURL" id="jsonURL"><br><br>
+            <input type="button" onclick="displayTable(document.getElementById('jsonURL').value)" value="Submit Query">
+        </div>
+    </body>
+    <script type="text/javascript">
+        var jsonDoc;
+        function loadJSON(url) {
+            var xmlhttp = new XMLHttpRequest();
+            
+            try {
+               xmlhttp.open("GET", url, false); 
+               xmlhttp.send();
+               jsonDoc = xmlhttp.responseText; 
+               return jsonDoc;
+            }
+            catch(err) {
+               alert("File not found!");
+            }
+        }
+        function displayTable(url) {
+            if(url == "") {
+                alert("Enter a filename.json");
+                return;
+            }
+			
+            jsonDoc = loadJSON(url);
+            var myObj = JSON.parse(jsonDoc);
+			
+            if(myObj['Mainline']['Table'].Row == undefined || myObj['Mainline']['Table'].Row.length == 0) {
+                alert("No data to display");
+            }
+            else {
+                // create a dynamic HTML table
+                var nWindow = window.open("", "Table Window", "fullscreen, scrollbars");
+                nWindow.document.open("text/html");
+                nWindow.document.write("<title>Largest Manufacturers by Production (2017)</title>");
+                nWindow.document.write("<table style=\"border: solid 1px black; border-collapse: separate;padding: 2px 3px;text-align: center;\">");
+    
+                for(i=0; i<myObj['Mainline']['Table']['Header']['Data'].length; i++) {
+                    if(myObj['Mainline']['Table']['Header']['Data'][i] != "null" && myObj['Mainline']['Table']['Header']['Data'][i] != "NULL") {
+                        nWindow.document.write("<th style=\"border: solid 1px black; border-collapse: separate;padding: 2px 3px;text-align: center;\">" + myObj['Mainline']['Table']['Header']['Data'][i] + "</th>");
+                    }
+                    else {
+                         nWindow.document.write("<th style=\"border: solid 1px black; border-collapse: separate;padding: 2px 3px;text-align: center;\"> </th>");
+                    }
+                }
+      
+                var col = [];
+                for(var key in myObj['Mainline']['Table']['Row'][0]) {
+                    col.push(key);
+                }
+      
+				// retrieve the content from file and add table row for each JSON object
+                for(i=0; i<myObj['Mainline']['Table']['Row'].length; i++) {
+                    nWindow.document.write("<tr>");
+                    for(j=0; j<col.length; j++) {
+                        nWindow.document.write("<td style=\"border: solid 1px black; border-collapse: separate;padding: 20px 3px;text-align: left;\">");
+                        if(col[j] == "HomePage") {
+                            if(myObj['Mainline']['Table']['Row'][i][col[j]] != "null" && myObj['Mainline']['Table']['Row'][i][col[j]]       != "NULL") {
+                                nWindow.document.write("<a href=" + myObj['Mainline']['Table']['Row'][i][col[j]] + ">" + myObj['Mainline']['Table']['Row'][i][col[j]] + "</a>");
+                            }
+                        }
+                        else if(col[j] == "Logo") {
+                            var image = myObj['Mainline']['Table']['Row'][i][col[j]];
+                            if(!image.replace(/\s/g, '').length || image == "null" || image=="NULL") {
+                                nWindow.document.write("<p></p>");
+                            }
+                            else {
+                                 nWindow.document.write("<img style=\"width: 150px; height: 150px; border: 1px solid white;\" alt=\" image\"src=\"" + image + "\"/>");
+                            }
+                        }
+                        else if(col[j] == "Hubs") {
+                            if(myObj['Mainline']['Table']['Row'][i][col[j]] != "null" && myObj['Mainline']['Table']['Row'][i][col[j]]       != "NULL") {
+                                var val = "<ul>";
+                                for(k=0; k<myObj['Mainline']['Table']['Row'][i]['Hubs']['Hub'].length; k++) {
+                                    if(k == 0) {
+                                        val += "<b><li>" + myObj['Mainline']['Table']['Row'][i]['Hubs']['Hub'][k] + "</li></b>";
+                                    }
+                                    else {
+                                        val += "<li>" + myObj['Mainline']['Table']['Row'][i]['Hubs']['Hub'][k] + "</li>";
+                                    }
+                                }
+                                val += "</ul>";
+                                nWindow.document.write(val);
+                            }
+                        }
+                        else {
+                            if(myObj['Mainline']['Table']['Row'][i][col[j]] != "null" && myObj['Mainline']['Table']['Row'][i][col[j]]       != "NULL") {
+                                nWindow.document.write(myObj['Mainline']['Table']['Row'][i][col[j]]);
+                            }
+                        }
+                        nWindow.document.write("</td>");
+                    }
+                    nWindow.document.write("</tr>");
+                }
+                nWindow.document.write("</table>");
+            }
+            nWindow.document.close();    
+        }
+    </script>
+</html>
