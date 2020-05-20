@@ -4,6 +4,8 @@
 - The JavaScript code then accepts this filename, checks if it has a .json extension and parses it. It further creates new HTML table elements and adds the appropriate content from the file in table headers and rows.
 - The result is, a new window with HTML table having the JSON data.
 - Note: The script needs to be hosted somewhere (like freevar) to avoid CORS issue.
-- Technologies used:
+
+Technologies used:
+  -
   - Languages: JavaScript
   - Web technologies: HTML, CSS
